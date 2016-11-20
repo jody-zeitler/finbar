@@ -1,0 +1,40 @@
+beginning:
+  text: You are in a bed.
+  actions:
+    -
+      text: stay here
+      node: beginning_stay
+    -
+      text: get up
+      node: beginning_wake
+
+beginning_stay:
+  text:
+    - Why waste energy moving around?
+    - The bed is just the right consistency and temperature.
+    - Perhaps getting up is the wrong choice.
+  actions:
+    -
+      text: stay here
+      node: beginning_stay
+    -
+      text: get up
+      node: beginning_wake
+
+beginning_wake:
+  text: |
+    You swing your feet around and plant them on the ground and tilt your torso into an upright position.
+
+    It is dark.
+  actions:
+    -
+      text: hunt around for a light
+      node: beginning_light
+    -
+      text: lie back down
+      feedback: Back to bed.
+      node: beginning_stay
+
+beginning_light:
+  text: |
+    A light switch is on the wall. Flicking it reveals a sparse but modern bedroom.

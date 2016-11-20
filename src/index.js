@@ -5,6 +5,8 @@ import { Provider } from 'react-redux'
 import configureStore from './store'
 import FinbarApp from './containers/FinbarApp'
 
+import '!!style-loader!css-loader!./style/global.css'
+
 const store = configureStore({})
 
 function initDOM() {
