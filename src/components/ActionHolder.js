@@ -6,7 +6,8 @@ const ActionHolder = (props) => {
 			{props.actions.map((action) => (
 				<button
 					key={action.text}
-					onClick={() => onClick(props, action)}
+					onClick={() => props.onClick(action)}
+					style={{ marginRight: 5 }}
 				>
 					{action.text}
 				</button>
@@ -15,23 +16,11 @@ const ActionHolder = (props) => {
 	)
 }
 
-const onClick = (props, action) => {
-	if (action.feedback) {
-		props.onFeedback(action.feedback)
-	}
-	if (action.node) {
-		props.onAdvance(action.node)
-	}
-}
-
 ActionHolder.propTypes = {
 	actions: PropTypes.arrayOf(PropTypes.shape({
-		text: PropTypes.string,
-		feedback: PropTypes.string,
-		node: PropTypes.string
+		text: PropTypes.string
 	})),
-	onFeedback: PropTypes.func.isRequired,
-	onAdvance: PropTypes.func.isRequired
+	onClick: PropTypes.func.isRequired
 }
 
 export default ActionHolder

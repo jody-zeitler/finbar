@@ -1,39 +1,30 @@
-import { sample } from 'lodash/collection'
-import { isArray } from 'lodash/lang'
-import { uniqueId } from 'lodash/util'
+import { isString } from 'lodash/lang'
 
-import reference from '../world/story.yaml'
+import { matchLocationProperty } from './location'
+import { pickElement } from '../util'
+
+import STORY from '../world/story.yaml'
 
 export const ADVANCE_NODE    = 'finbar/story/ADVANCE_NODE'
-export const LOG_FEEDBACK = 'finbar/story/LOG_FEEDBACK'
+export const LOG_INTERACTION = 'finbar/story/LOG_INTERACTION'
 
-const MAX_INTERACTIONS = 50;
-
-const pickElement = (array) => isArray(array) ? sample(array) : array
-const idInteraction = (text) => ({
-	uid: uniqueId(),
-	text
-})
+const INTERACTION_RETENTION = 50;
 
 const initialState = {
-	nodeId: 'beginning',
-	interactions: [
-		idInteraction(pickElement(reference['beginning'].text))
-	]
+	nodeId: 'bedroom_bunk',
+	timestamp: Date.now(),
+	interactions: []
 }
 
 export default function reducer(state = initialState, action = {}) {
 	switch (action.type) {
 	case ADVANCE_NODE:
-		const node = reference[action.nodeId]
-		const text = pickElement(node.text)
 		return Object.assign({}, state, {
-			nodeId: action.nodeId,
-			interactions: [...state.interactions, idInteraction(text)].slice(-MAX_INTERACTIONS)
+			nodeId: action.nodeId
 		})
-	case LOG_FEEDBACK:
+	case LOG_INTERACTION:
 		return Object.assign({}, state, {
-			interactions: [...state.interactions, idInteraction(action.text)].slice(-MAX_INTERACTIONS)
+			interactions: [...state.interactions, idInteraction(action.text)].slice(-INTERACTION_RETENTION)
 		})
 	default:
 		return state
@@ -42,8 +33,20 @@ export default function reducer(state = initialState, action = {}) {
 
 /* Selectors */
 
-export const node = (state) => reference[state.story.nodeId]
-export const nodeActions = (state) => node(state).actions
+export const node = (state) => STORY[state.story.nodeId]
+export const nodeDescriptions = (state) => {
+	const descriptions = node(state).description || []
+	if (isString(descriptions)) {
+		return [descriptions]
+	}
+	return descriptions
+		.filter((desc) => matchConditions(state, desc.conditions))
+		.map((desc) => desc.text || desc)
+}
+export const nodeActions = (state) => {
+	const actions = node(state).actions || []
+	return actions.filter((act) => matchConditions(state, act.conditions))
+}
 
 /* Actions */
 
@@ -51,8 +54,21 @@ export function advanceNode(nodeId) {
 	return { type: ADVANCE_NODE, nodeId }
 }
 
-export function logFeedback(text) {
-	return { type: LOG_FEEDBACK, text }
+export function logInteraction(text) {
+	return { type: LOG_INTERACTION, text }
 }
 
 /* Util */
+
+let interactionId = 0;
+const idInteraction = (text) => ({
+	uid: ++interactionId,
+	text
+})
+const matchConditions = (state, conditions = []) => {
+	return conditions.every((condition) => {
+		if (condition[0] === 'location') {
+			return matchLocationProperty(state, ...condition.slice(1))
+		}
+	})
+}

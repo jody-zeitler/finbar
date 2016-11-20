@@ -15,7 +15,7 @@ const InteractionLog = (props) => {
 
 InteractionLog.propTypes = {
 	interactions: PropTypes.arrayOf(PropTypes.shape({
-		uid: PropTypes.string.isRequired,
+		uid: PropTypes.number.isRequired,
 		text: PropTypes.string.isRequired
 	})).isRequired
 }

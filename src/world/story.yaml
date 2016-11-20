@@ -1,40 +1,62 @@
-beginning:
-  text: You are in a bed.
+bedroom_bunk:
+  description: You are in a bed.
   actions:
     -
       text: stay here
-      node: beginning_stay
+      feedback:
+        - Yes, why waste energy moving around?
+        - The bed is just the right consistency and temperature.
+        - Perhaps getting up is the wrong choice.
     -
       text: get up
-      node: beginning_wake
+      feedback: >
+        You swing your feet around and plant them on the floor, tilting your torso into an upright
+        position and elevating your head.
+      node: bedroom_floor
 
-beginning_stay:
-  text:
-    - Why waste energy moving around?
-    - The bed is just the right consistency and temperature.
-    - Perhaps getting up is the wrong choice.
+bedroom_floor:
+  description:
+    -
+      conditions:
+        - ['location', 'bedroom.lightsOn', '!']
+      text: It is dark.
+    -
+      conditions:
+       - ['location', 'bedroom.lightsOn']
+      text: You're in a sparse but modern bedroom.
   actions:
     -
-      text: stay here
-      node: beginning_stay
-    -
-      text: get up
-      node: beginning_wake
-
-beginning_wake:
-  text: |
-    You swing your feet around and plant them on the ground and tilt your torso into an upright position.
-
-    It is dark.
-  actions:
-    -
+      conditions:
+        - ['location', 'bedroom.lightsOn', '!']
       text: hunt around for a light
-      node: beginning_light
+      feedback: A light switch is on the wall. Flicking it reveals a sparse but modern bedroom.
+      effects:
+        - ['location', 'bedroom.lightsOn', true]
+    -
+      conditions:
+        - ['location', 'bedroom.lightsOn']
+      text: enter the bathroom
+      node: bedroom_bathroom
     -
       text: lie back down
-      feedback: Back to bed.
-      node: beginning_stay
+      feedback: Back to bed with you.
+      node: bedroom_bunk
 
-beginning_light:
-  text: |
-    A light switch is on the wall. Flicking it reveals a sparse but modern bedroom.
+bedroom_bathroom:
+  description:
+    - This is your bathroom.
+    -
+      conditions:
+        - ['location', 'bedroom.teethBrushed', '!']
+      text: A toothbrush beckons you to clean your teeth.
+  actions:
+    -
+      conditions:
+        - ['location', 'bedroom.teethBrushed', '!']
+      text: brush your teeth
+      feedback: It takes some effort, but you manage to scrape off a layer of plaque off your chompers.
+      effects:
+        - ['location', 'bedroom.teethBrushed', true]
+    -
+      text: back to bedroom
+      node: bedroom_floor
