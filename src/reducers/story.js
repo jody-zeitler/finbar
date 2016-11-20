@@ -79,3 +79,8 @@ const matchConditions = (state, conditions = []) => {
 		return true
 	})
 }
+
+if (module.hot) {
+  module.hot.accept('../world/story.yaml', () => {
+  })
+}
