@@ -1,5 +1,17 @@
 bedroom_bunk:
-  description: You are in a bed.
+  description:
+    -
+      initial: true
+      text: |
+        Your brain is awake. It directs your eyes to open slowly and take in the place where
+        it left your body. The eyes, however, see nothing: the room is completely dark. Your
+        body is wrapped up in a blanket that keeps it at a cozy temperature. This is offset
+        by a pounding sensation in the skull. It must have been thrown against an immovable
+        object, or absorbed too many alcohol molecules. In either case, moving is not in the
+        best interest of any part of you.
+    -
+      initial: false
+      text: You are in a cozy bed that is designed to psychologically prevent you from leaving.
   actions:
     -
       text: stay here
@@ -9,9 +21,9 @@ bedroom_bunk:
         - Perhaps getting up is the wrong choice.
     -
       text: get up
-      feedback: >
+      feedback: |
         You swing your feet around and plant them on the floor, tilting your torso into an upright
-        position and elevating your head.
+        position and elevating your head. An involuntary groan escapes your throat.
       node: bedroom_floor
 
 bedroom_floor:
@@ -19,17 +31,29 @@ bedroom_floor:
     -
       conditions:
         - ['location', 'bedroom.lightsOn', '!']
-      text: It is dark.
+      text: It is too dark to see anything.
     -
       conditions:
        - ['location', 'bedroom.lightsOn']
-      text: You're in a sparse but modern bedroom.
+      text: |
+        You're in a sparse but modern bedroom. Everything connected to the floor begins with wood
+        paneling. The walls hold a strip of light at waist level, and continue on to the ceiling
+        with a unprovoking solid brown paint layer.
+
+        A bed is built into the center of the room. There are doors to a bathroom and to the outside,
+        presumably.
   actions:
     -
       conditions:
         - ['location', 'bedroom.lightsOn', '!']
       text: hunt around for a light
-      feedback: A light switch is on the wall. Flicking it reveals a sparse but modern bedroom.
+      feedback: |
+        A light switch is on the wall. Flicking it reveals a sparse but modern bedroom. Everything
+        connected to the floor begins with wood paneling. The walls hold a strip of light at waist
+        level, and continue on to the ceiling with a unprovoking solid brown paint layer.
+
+        A bed is built into the center of the room. There are doors to a bathroom and to the outside,
+        presumably.
       effects:
         - ['location', 'bedroom.lightsOn', true]
     -
@@ -39,24 +63,49 @@ bedroom_floor:
       node: bedroom_bathroom
     -
       text: lie back down
-      feedback: Back to bed with you.
+      feedback: Back to bed you go.
       node: bedroom_bunk
 
 bedroom_bathroom:
   description:
-    - This is your bathroom.
+    - |
+      This is a bathroom. A small shower, short toilet and a countertop with a sink are crammed into
+      the available space. A mirror takes up an entire wall.
+    -
+      initial: true
+      text: |
+        As you gaze up into the mirror with simple curiousity, you begin to wonder who that disheveled
+        fellow is that is glaring back at you with unabashed malice. What did you ever do to deserve
+        such scorn? You cannot recall anything past the grogginess that is front and center. You can't
+        even bring your name to light.
     -
       conditions:
-        - ['location', 'bedroom.teethBrushed', '!']
+        - ['player', 'teeth.brushed', '!']
       text: A toothbrush beckons you to clean your teeth.
   actions:
     -
       conditions:
-        - ['location', 'bedroom.teethBrushed', '!']
-      text: brush your teeth
-      feedback: It takes some effort, but you manage to scrape off a layer of plaque off your chompers.
+        - ['player', 'face.washed', '!']
+      text: wash your face
+      feedback: |
+        A gush of lukewarm water is released when your hands move in front of the faucet. You bend
+        down and splash some handfuls onto your face. A name surfaces in your mind: Wallis Finbar.
+        It sounds like it belongs to a moron, so you assume it must be yours.
       effects:
-        - ['location', 'bedroom.teethBrushed', true]
+        - ['player', 'face.washed', true]
+        - ['player', 'name', 'Wallis Finbar']
+    -
+      conditions:
+        - ['player', 'teeth.brushed', '!']
+      text: brush your teeth
+      feedback: |
+        It takes some effort, but you manage to scrape off a layer of plaque off your chompers. You
+        remember you're a deliveryman of some sort. Kitchen appliances? Sausages? Cars! Yes! But not
+        ground transportation. This is the future, and you're responsible for driving affordable
+        intergalatic starships to the men, creatures or artificial lifeforms that needs them most.
+      effects:
+        - ['player', 'teeth.brushed', true]
+        - ['player', 'occupation', 'Car Deliveryhuman']
     -
       text: back to bedroom
       node: bedroom_floor

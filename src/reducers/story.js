@@ -1,6 +1,7 @@
-import { isString } from 'lodash/lang'
+import { isBoolean, isString } from 'lodash/lang'
 
-import { matchLocationProperty } from './location'
+import { matchLocationProperty, nodeVisitedMatcher } from './location'
+import { matchPlayerProperty } from './player'
 import { pickElement } from '../util'
 
 import STORY from '../world/story.yaml'
@@ -12,7 +13,6 @@ const INTERACTION_RETENTION = 50;
 
 const initialState = {
 	nodeId: 'bedroom_bunk',
-	timestamp: Date.now(),
 	interactions: []
 }
 
@@ -35,12 +35,16 @@ export default function reducer(state = initialState, action = {}) {
 
 export const node = (state) => STORY[state.story.nodeId]
 export const nodeDescriptions = (state) => {
+	const nodeId = state.story.nodeId
 	const descriptions = node(state).description || []
 	if (isString(descriptions)) {
 		return [descriptions]
 	}
 	return descriptions
-		.filter((desc) => matchConditions(state, desc.conditions))
+		.filter((desc) => {
+			const initial = isBoolean(desc.initial) ? [nodeVisitedMatcher(nodeId, !desc.initial)] : []
+			return matchConditions(state, initial.concat(desc.conditions || []))
+		})
 		.map((desc) => desc.text || desc)
 }
 export const nodeActions = (state) => {
@@ -69,6 +73,9 @@ const matchConditions = (state, conditions = []) => {
 	return conditions.every((condition) => {
 		if (condition[0] === 'location') {
 			return matchLocationProperty(state, ...condition.slice(1))
+		} else if (condition[0] === 'player') {
+			return matchPlayerProperty(state, ...condition.slice(1))
 		}
+		return true
 	})
 }

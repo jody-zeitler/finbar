@@ -10,8 +10,12 @@ import {
 	logInteraction
 } from '../reducers/story'
 import {
-	setLocationProperty
+	setLocationProperty,
+	setVisitedFlag
 } from '../reducers/location'
+import {
+	setPlayerProperty
+} from '../reducers/player'
 
 import ActionHolder from '../components/ActionHolder'
 import InteractionLog from '../components/InteractionLog'
@@ -20,12 +24,12 @@ import styles from '../style/common.css'
 
 class FinbarApp extends Component {
 	componentDidMount() {
-		this.commitNode(this.props.descriptions)
+		this.commitNode(this.props)
 	}
 
 	shouldComponentUpdate(nextProps) {
 		if (nextProps.nodeId !== this.props.nodeId) {
-			this.commitNode(nextProps.descriptions)
+			this.commitNode(nextProps)
 			return false
 		}
 		return true
@@ -53,6 +57,8 @@ class FinbarApp extends Component {
 			action.effects.forEach((effect) => {
 				if (effect[0] === 'location') {
 					this.props.setLocationProperty(...effect.slice(1))
+				} else if (effect[0] === 'player') {
+					this.props.setPlayerProperty(...effect.slice(1))
 				}
 			})
 		}
@@ -61,8 +67,9 @@ class FinbarApp extends Component {
 		}
 	}
 
-	commitNode(descriptions) {
-		descriptions.forEach((desc) => {
+	commitNode(props) {
+		this.props.setVisitedFlag(props.nodeId)
+		props.descriptions.forEach((desc) => {
 			this.props.logInteraction(desc)
 		})
 	}
@@ -88,7 +95,9 @@ function bind(dispatch) {
 	return bindActionCreators({
 		advanceNode,
 		logInteraction,
-		setLocationProperty
+		setLocationProperty,
+		setVisitedFlag,
+		setPlayerProperty
 	}, dispatch)
 }
 

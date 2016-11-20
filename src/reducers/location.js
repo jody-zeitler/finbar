@@ -1,11 +1,16 @@
 import { get, set, merge } from 'lodash/object'
-import { isArray, isNumber, isString, isUndefined } from 'lodash/lang'
+import { isArray, isBoolean, isNumber, isString, isUndefined } from 'lodash/lang'
+
+import { matchProperty } from '../util'
 
 export const SET_LOCATION_PROPERTY    = 'finbar/location/SET_LOCATION_PROPERTY'
 export const TOGGLE_LOCATION_PROPERTY = 'finbar/location/TOGGLE_LOCATION_PROPERTY'
-export const MUTATE_LOCATION_PROPERTY = 'finbar/location/INCREMENT_LOCATION_PROPERTY'
+export const MUTATE_LOCATION_PROPERTY = 'finbar/location/MUTATE_LOCATION_PROPERTY'
+
+export const SET_VISITED_FLAG = 'finbar/location/SET_VISITED_FLAG'
 
 const initialState = {
+	_visited: {},
 	bedroom: {
 		lightsOn: false
 	}
@@ -33,6 +38,10 @@ export default function reducer(state = initialState, action = {}) {
 		const branch = set({}, action.key, newValue)
 		return merge({}, state, branch)
 	}
+	case SET_VISITED_FLAG: {
+		const branch = set({}, `_visited.${action.nodeId}`, action.value)
+		return merge({}, state, branch)
+	}
 	default:
 		return state
 	}
@@ -42,25 +51,7 @@ export default function reducer(state = initialState, action = {}) {
 
 export const getLocationProperty = (state, key) => get(state.location, key)
 export const matchLocationProperty = (state, key, cmp, value) => {
-	if (isUndefined(value) && cmp !== '!') {
-		if (isString(cmp)) {
-			value = cmp
-		} else {
-			value = true
-		}
-		cmp = '=='
-	}
-	const current = getLocationProperty(state, key)
-	switch (cmp) {
-	case '!':
-		return !current
-	case '==':
-		return current === value
-	case '!=':
-		return current !== value
-	default:
-		return false
-	}
+	return matchProperty(getLocationProperty(state, key), cmp, value)
 }
 
 /* Actions */
@@ -76,3 +67,11 @@ export function toggleLocationProperty(key) {
 export function mutateLocationProperty(key, value) {
 	return { type: MUTATE_LOCATION_PROPERTY, key }
 }
+
+export function setVisitedFlag(nodeId, value) {
+	return { type: SET_VISITED_FLAG, nodeId, value: isBoolean(value) ? value : true }
+}
+
+/* Util */
+
+export const nodeVisitedMatcher = (nodeId, bool) => ['location', `_visited.${nodeId}`, bool ? '?' : '!']

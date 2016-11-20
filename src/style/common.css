@@ -10,7 +10,7 @@
 }
 
 .interaction-item {
-	white-space: pre;
-	line-height: 0.8em;
+	white-space: pre-wrap;
+	line-height: 1.2em;
 	margin: 1.8em 0;
 }
