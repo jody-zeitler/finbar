@@ -1,4 +1,4 @@
-import { isBoolean, isString } from 'lodash/lang'
+import { isArray, isBoolean, isString } from 'lodash/lang'
 
 import { matchLocationProperty, nodeVisitedMatcher } from './location'
 import { matchPlayerProperty } from './player'
@@ -43,13 +43,13 @@ export const nodeDescriptions = (state) => {
 	return descriptions
 		.filter((desc) => {
 			const initial = isBoolean(desc.initial) ? [nodeVisitedMatcher(nodeId, !desc.initial)] : []
-			return matchConditions(state, initial.concat(desc.conditions || []))
+			return matchAllConditions(state, initial.concat(desc.conditions || []))
 		})
 		.map((desc) => desc.text || desc)
 }
 export const nodeActions = (state) => {
 	const actions = node(state).actions || []
-	return actions.filter((act) => matchConditions(state, act.conditions))
+	return actions.filter((act) => matchAllConditions(state, act.conditions))
 }
 
 /* Actions */
@@ -69,15 +69,28 @@ const idInteraction = (text) => ({
 	uid: ++interactionId,
 	text
 })
-const matchConditions = (state, conditions = []) => {
-	return conditions.every((condition) => {
-		if (condition[0] === 'location') {
-			return matchLocationProperty(state, ...condition.slice(1))
-		} else if (condition[0] === 'player') {
-			return matchPlayerProperty(state, ...condition.slice(1))
-		}
+const matchOneCondition = (state, condition) => {
+	const branch = condition[0]
+	const args = condition.slice(1)
+	switch (branch) {
+	case 'location':
+		return matchLocationProperty(state, ...args)
+	case 'player':
+		return matchPlayerProperty(state, ...args)
+	default:
 		return true
-	})
+	}
+}
+const matchAllConditions = (state, conditions = []) => {
+	const ors = conditions.or
+	const ands = conditions.and || conditions
+	if (isArray(ors) && !ors.some((c) => matchOneCondition(state, c))) {
+		return false
+	}
+	if (isArray(ands) && !ands.every((c) => matchOneCondition(state, c))) {
+		return false
+	}
+	return true
 }
 
 if (module.hot) {

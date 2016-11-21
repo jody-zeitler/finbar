@@ -88,7 +88,9 @@ bedroom_bathroom:
         - ['player', 'face.washed', '!']
       text: wash your face
       feedback: |
-        A gush of lukewarm water is released when your hands move in front of the faucet. You bend
+        (You've just gained +1 Cleanliness!) (Just kidding: we don't keep track of that stuff.)
+
+        A gush of lukewarm water is released when you place your hands front of the faucet. You bend
         down and splash some handfuls onto your face. A name surfaces in your mind: Wallis Finbar.
         It sounds like it belongs to a moron, so you assume it must be yours.
       effects:
@@ -107,5 +109,56 @@ bedroom_bathroom:
         - ['player', 'teeth.brushed', true]
         - ['player', 'occupation', 'Car Deliveryhuman']
     -
+      conditions:
+        or:
+          - ['player', 'face.washed', '!']
+          - ['player', 'teeth.brushed', '!']
       text: back to bedroom
       node: bedroom_floor
+    -
+      conditions:
+        and:
+          - ['player', 'face.washed']
+          - ['player', 'teeth.brushed']
+      text: face the world
+      node: bedroom_crisis
+
+bedroom_crisis:
+  description:
+    - |
+      BOOM! Your bedroom shakes like a wet dog and its lights flicker in shock. The concussion knocks
+      you to the floor. Resonating in the air is the sound a tin can makes when hit by a rock, with
+      you being inside of it.
+
+      A klaxon screeches out a single blast and an obnoxious robotic voice makes itself heard.
+
+      "Captain to the bridge! We're under attack!"
+  actions:
+    -
+      text: go to the bridge
+      feedback: You step through the only other door in the room onto "the bridge".
+      node: bridge_crisis
+    -
+      text: go back to bed
+      feedback:
+        - No!
+        - Some people just want to watch the world burn.
+        - Insanity does not befit someone of your caliber.
+
+bridge_crisis:
+  description:
+    - |
+      "The bridge" is the only remaining compartment aboard this ship. Yes you are on a ship, because
+      you are a spaceship deliveryhuman trying to get this overpriced bucket to a nine-eyed Qztalorian
+      on Ysolad IX in strictly less than two pieces. This part of the ship is only slightly bigger than
+      the bathroom. Why so small? Because it's a luxury class vessel and the market research found it
+      perfectly reasonable to short-change utility in order to get a good week's rest.
+
+      Anyway, you manage to squeeze your chubby existence into the cockpit. The seat was designed for
+      five-plus legged creatures, but you've jury-rigged up a system to compensate for your inadequacy.
+      You pull all the instruments in close.
+  actions:
+    -
+      text: check the dradis for contacts
+    -
+      text: start maneuvering to get your bearings

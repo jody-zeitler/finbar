@@ -3,7 +3,7 @@ import React, { PropTypes } from 'react'
 import styles from '../style/common.css'
 
 const InteractionLog = (props) => {
-	const recent = props.interactions.slice(-5)
+	const recent = props.interactions.slice(-6)
 	return (
 		<div>
 			{recent.map((ia) => (
