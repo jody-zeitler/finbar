@@ -162,3 +162,5 @@ bridge_crisis:
       text: check the dradis for contacts
     -
       text: start maneuvering to get your bearings
+    -
+      text: ask the computer for a situation report
